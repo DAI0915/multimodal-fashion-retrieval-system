@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# Virtual environment
+.venv/
+venv/
+
+# macOS
+.DS_Store
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Large model / retrieval artifacts
+artifacts/*.onnx
+artifacts/*.npy
+
+# MLflow
+mlruns/
+mlflow.db
+
+# Environment variables
+.env
+
+# IDE
+.vscode/
+.idea/
