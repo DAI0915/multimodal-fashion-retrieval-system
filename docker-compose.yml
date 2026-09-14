@@ -7,6 +7,8 @@ services:
       - "8000:8000"
     volumes:
       - ./artifacts:/app/artifacts:ro
+    environment:
+      PUBLIC_API_BASE_URL: http://localhost:8000
 
   frontend:
     build:

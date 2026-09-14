@@ -1,6 +1,7 @@
 from io import BytesIO
+import os
 
-from fastapi import FastAPI, File, Form, HTTPException, UploadFile
+from fastapi import FastAPI, File, Form, HTTPException, UploadFile, Request
 from fastapi.responses import FileResponse
 from PIL import Image
 
@@ -17,6 +18,8 @@ app = FastAPI(
     ),
     version="1.0.0"
 )
+
+PUBLIC_API_BASE_URL = os.getenv("PUBLIC_API_BASE_URL")
 
 
 @app.get("/")
@@ -42,19 +45,18 @@ def catalog_image(image_id: str):
 
 @app.post("/search")
 async def search(
+    request: Request,
     image: UploadFile = File(...),
     text: str = Form(...),
     top_k: int = Form(5)
 ):
 
-    # Validate top_k
     if top_k < 1 or top_k > 50:
         raise HTTPException(
             status_code=400,
             detail="top_k must be between 1 and 50."
         )
 
-    # Read image
     try:
         image_bytes = await image.read()
 
@@ -68,7 +70,6 @@ async def search(
             detail="Invalid image file."
         )
 
-    # ONNX inference
     try:
         query_embedding = create_query_embedding(
             image=pil_image,
@@ -81,17 +82,19 @@ async def search(
             detail=f"Inference failed: {str(e)}"
         )
 
-    # Top-K retrieval
     results = search_catalog(
         query_embedding=query_embedding,
         top_k=top_k
     )
 
-    # Add image URLs
+    if PUBLIC_API_BASE_URL:
+        base_url = PUBLIC_API_BASE_URL.rstrip("/")
+    else:
+        base_url = str(request.base_url).rstrip("/")
+
     for result in results:
         result["image_url"] = (
-            f"http://127.0.0.1:8000/"
-            f"catalog-image/{result['image_id']}"
+            f"{base_url}/catalog-image/{result['image_id']}"
         )
 
     return {

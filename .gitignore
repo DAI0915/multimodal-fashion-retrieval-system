@@ -27,3 +27,4 @@ mlflow.db
 # IDE
 .vscode/
 .idea/
+artifacts/catalog_images/
