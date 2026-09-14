@@ -11,5 +11,7 @@ tqdm
 mlflow
 onnx
 onnxruntime
+onnxscript
 jupyterlab
 ipykernel
+ipywidgets
